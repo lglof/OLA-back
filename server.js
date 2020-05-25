@@ -40,6 +40,22 @@ app.post('/insert_entry', (req, res) => {
 });
 
 // GET ALL table entries (with attached ID)
+app.get('/query', (req, res) => {
+  console.log("here comes the query!");
+  var params = req.query;
+  var keys = Object.keys(params);
+  console.log(params);
+  var sql = "SELECT * FROM base_requests";
+  for (var i = 0; i < keys.length; i += 1) {
+    sql += i > 0 ? " AND" : " WHERE";
+    sql += params[keys[i]].length ? ` ${keys[i]}='${params[keys[i]]}'` : '';
+  }
+  con.query(sql, (err, result) => {
+    if (err) throw err;
+    res.json(result);
+  });
+
+})
 
 // DELETE a table entry with the ID
 app.delete('/delete_entry', (req, res) => {
