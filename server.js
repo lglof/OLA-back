@@ -34,12 +34,9 @@ app.post('/insert_entry', (req, res) => {
   const sql = `INSERT INTO base_requests (name, contact, request, due) VALUES ('${contents.name}', '${contents.contact}', '${contents.request}', '${contents.due}')`;
   con.query(sql, (err, result) => {
     if (err) throw err;
+    res.send(JSON.stringify({ "status": 200, "response": result }));
   });
-  console.log('1 record inserted');
-  res.send();
 });
-
-// GET ALL table entries (with attached ID)
 app.get('/query', (req, res) => {
   console.log("here comes the query!");
   var params = req.query;
@@ -56,8 +53,6 @@ app.get('/query', (req, res) => {
   });
 
 })
-
-// DELETE a table entry with the ID
 app.delete('/delete_entry', (req, res) => {
   console.log('deleting');
   var id = req.body.id;
