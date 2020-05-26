@@ -9,14 +9,7 @@ const con = mysql.createConnection({
 });
 
 con.query(
-  'CREATE TABLE base_requests (id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, name VARCHAR(255) NOT NULL, contact VARCHAR(255) NOT NULL, request TEXT NOT NULL, due DATE )',
-  (err) => {
-    if (err) throw err;
-  }
-);
-
-con.query(
-  'CREATE TABLE helpful_OLAs (id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, name VARCHAR(255) DEFAULT "lars", skills JSON)',
+  'CREATE TABLE IF NOT EXISTS base_requests (id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, name VARCHAR(255) NOT NULL, contact VARCHAR(255) NOT NULL, request TEXT NOT NULL, due DATE )',
   (err) => {
     if (err) throw err;
   }
