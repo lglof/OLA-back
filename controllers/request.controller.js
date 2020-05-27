@@ -8,10 +8,12 @@ exports.create = (req, res) => {
   }
 
   const request = new Request({
-    name: req.body.name || 'unspecified',
-    contact: req.body.contact || 'unspecified',
-    request: req.body.request || 'unspecified',
-    due: req.body.due || '2020-05-05'
+    name: req.body.name,
+    contact: req.body.contact,
+    title: req.body.title,
+    due: req.body.due,
+    description: req.body.description,
+    course: req.body.course
   })
 
   Request.create(request, (err, data) => {

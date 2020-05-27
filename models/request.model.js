@@ -3,12 +3,16 @@ const sql = require('./db.js')
 const Request = function (request) {
   this.name = request.name
   this.contact = request.contact
-  this.request = request.request
+  this.title = request.title
   this.due = request.due
+  this.description = request.description
+  this.course = request.course
 }
 
+const table = 'new_requests'
+
 Request.create = (newRequest, result) => {
-  sql.query('INSERT INTO base_requests SET ?', newRequest, (err, res) => {
+  sql.query(`INSERT INTO ${table} SET ?`, newRequest, (err, res) => {
     if (err) {
       console.log('error: ', err)
       return (err, null)
@@ -23,7 +27,7 @@ Request.query = (params, result) => {
   console.log('model')
   var keys = Object.keys(params)
   console.log(params)
-  var sqlQ = 'SELECT * FROM base_requests'
+  var sqlQ = `SELECT * FROM ${table}`
   for (var i = 0; i < keys.length; i += 1) {
     sqlQ += i > 0 ? ' AND' : ' WHERE'
     sqlQ += params[keys[i]].length ? ` ${keys[i]}='${params[keys[i]]}'` : ''
@@ -46,7 +50,7 @@ Request.query = (params, result) => {
 }
 
 Request.remove = (id, result) => {
-  sql.query(`DELETE FROM base_requests WHERE id = '${id}'`, (err, res) => {
+  sql.query(`DELETE FROM ${table} WHERE id = '${id}'`, (err, res) => {
     if (err) {
       console.log('error: ', err)
       result(null, err)

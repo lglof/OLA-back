@@ -1,16 +1,18 @@
-const mysql = require('mysql');
-require('dotenv').config();
+const mysql = require('../models/db')
 
-const con = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  database: 'OLA_requests',
-});
+const tableConfig = 'id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,' +
+  ' name VARCHAR(255) DEFAULT "unspecified",' +
+  ' contact VARCHAR(255) NOT NULL,' +
+  ' title VARCHAR(255) DEFAULT "request",' +
+  ' due DATE DEFAULT "2020-05-05",' +
+  ' description TEXT NOT NULL,' +
+  ' course VARCHAR(255) DEFAULT "unspecified"'
 
-con.query(
-  'CREATE TABLE IF NOT EXISTS base_requests (id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, name VARCHAR(255) NOT NULL, contact VARCHAR(255) NOT NULL, request TEXT NOT NULL, due DATE )',
+const queryText = `CREATE TABLE IF NOT EXISTS new_requests(${tableConfig})`
+
+mysql.query(
+  queryText,
   (err) => {
-    if (err) throw err;
+    if (err) throw err
   }
-);
+)
