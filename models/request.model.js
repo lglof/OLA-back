@@ -1,5 +1,7 @@
 const sql = require('./db.js')
+const logger = require('../config/winston')
 
+// eslint-disable-next-line func-names
 const Request = function (request) {
   this.name = request.name
   this.contact = request.contact
@@ -14,33 +16,31 @@ const table = 'new_requests'
 Request.create = (newRequest, result) => {
   sql.query(`INSERT INTO ${table} SET ?`, newRequest, (err, res) => {
     if (err) {
-      console.log('error: ', err)
-      return (err, null)
+      logger.error('error: ', err)
+      return err
     }
 
-    console.log('created request: ', { id: res.insertId, ...newRequest })
+    logger.info('created request: ', { id: res.insertId, ...newRequest })
     result(null, { id: res.insertId, ...newRequest })
+    return null
   })
 }
 
 Request.query = (params, result) => {
-  console.log('model')
-  var keys = Object.keys(params)
-  console.log(params)
-  var sqlQ = `SELECT * FROM ${table}`
-  for (var i = 0; i < keys.length; i += 1) {
+  const keys = Object.keys(params)
+  let sqlQ = `SELECT * FROM ${table}`
+  for (let i = 0; i < keys.length; i += 1) {
     sqlQ += i > 0 ? ' AND' : ' WHERE'
     sqlQ += params[keys[i]].length ? ` ${keys[i]}='${params[keys[i]]}'` : ''
   }
-  console.log(sqlQ)
   sql.query(sqlQ, (err, res) => {
     if (err) {
-      console.log('error: ', err)
+      logger.error('error: ', err)
       result(err, null)
       return
     }
     if (res.length) {
-      console.log(`found ${res.length} requests`)
+      logger.info(`found ${res.length} requests`)
       result(null, res)
       return
     }
@@ -50,19 +50,25 @@ Request.query = (params, result) => {
 }
 
 Request.remove = (id, result) => {
+  if (!id) {
+    result({ kind: 'no_id' }, null)
+    return
+  }
+
   sql.query(`DELETE FROM ${table} WHERE id = '${id}'`, (err, res) => {
     if (err) {
-      console.log('error: ', err)
+      logger.error('error: ', err)
       result(null, err)
       return
     }
 
     if (res.affectedRows === 0) {
+      logger.info('no records found')
       result({ kind: 'not_found' }, null)
       return
     }
 
-    console.log(`deleted request with id ${id}`)
+    logger.info(`deleted request with id ${id}`)
     result(null, res)
   })
 }

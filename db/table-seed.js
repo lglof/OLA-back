@@ -1,6 +1,7 @@
 const mysql = require('../models/db')
 
-const tableConfig = 'id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,' +
+const tableConfig =
+  'id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,' +
   ' name VARCHAR(255) DEFAULT "unspecified",' +
   ' contact VARCHAR(255) NOT NULL,' +
   ' title VARCHAR(255) DEFAULT "request",' +
@@ -10,9 +11,6 @@ const tableConfig = 'id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,' +
 
 const queryText = `CREATE TABLE IF NOT EXISTS new_requests(${tableConfig})`
 
-mysql.query(
-  queryText,
-  (err) => {
-    if (err) throw err
-  }
-)
+mysql.query(queryText, (err) => {
+  if (err) throw err
+})
