@@ -89,3 +89,7 @@ Logging is done with a combination of [morgan](https://github.com/expressjs/morg
 They create logs of errors and requests which are available at `/logs/`.
 
 Stretch goal: send these logs to mysql instead of dumping into a textfile.
+
+## Serving
+
+This should be running on the SYDE/BME server using [forever](https://www.npmjs.com/package/forever). They have a good documentation, worth checking out.
