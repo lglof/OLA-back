@@ -10,3 +10,5 @@ const con = mysql.createConnection({
 con.query('CREATE DATABASE IF NOT EXISTS OLA_requests', (error) => {
   if (error) throw error
 })
+
+process.exit()

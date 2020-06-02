@@ -14,3 +14,5 @@ const queryText = `CREATE TABLE IF NOT EXISTS new_requests(${tableConfig})`
 mysql.query(queryText, (err) => {
   if (err) throw err
 })
+
+process.exit()
