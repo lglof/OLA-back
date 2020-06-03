@@ -11,27 +11,38 @@ const Request = function (request) {
   this.course = request.course
 }
 
-const table = 'new_requests'
-
-Request.create = (newRequest, result) => {
-  sql.query(`INSERT INTO ${table} SET ?`, newRequest, (err, res) => {
-    if (err) {
-      logger.error('error: ', err)
-      return err
-    }
-
-    logger.info('created request: ', { id: res.insertId, ...newRequest })
-    result(null, { id: res.insertId, ...newRequest })
-    return null
-  })
+function whichTable(archive) {
+  if (archive) {
+    return 'archive_requests'
+  }
+  return 'new_requests'
 }
 
-Request.query = (params, result) => {
-  const keys = Object.keys(params)
-  let sqlQ = `SELECT * FROM ${table}`
+Request.create = (newRequest, archive, result) => {
+  sql.query(
+    `INSERT INTO ${whichTable(archive)} SET ?`,
+    newRequest,
+    (err, res) => {
+      if (err) {
+        logger.error('error: ', err)
+        return err
+      }
+
+      logger.info('created request: ', { id: res.insertId, ...newRequest })
+      result(null, { id: res.insertId, ...newRequest })
+      return null
+    }
+  )
+}
+
+Request.query = (req, archive, result) => {
+  let sqlQ = `SELECT * FROM ${whichTable(archive)}`
+  const keys = Object.keys(req.params)
   for (let i = 0; i < keys.length; i += 1) {
     sqlQ += i > 0 ? ' AND' : ' WHERE'
-    sqlQ += params[keys[i]].length ? ` ${keys[i]}='${params[keys[i]]}'` : ''
+    sqlQ += req.params[keys[i]].length
+      ? ` ${keys[i]}='${req.params[keys[i]]}'`
+      : ''
   }
   sql.query(sqlQ, (err, res) => {
     if (err) {
@@ -49,13 +60,33 @@ Request.query = (params, result) => {
   })
 }
 
-Request.remove = (id, result) => {
-  if (!id) {
-    result({ kind: 'no_id' }, null)
-    return
-  }
+Request.remove = (body, archive, result) => {
+  sql.query(
+    `DELETE FROM ${whichTable(archive)} WHERE id = '${body.id}'`,
+    (err, res) => {
+      if (err) {
+        logger.error('error: ', err)
+        result(null, err)
+        return
+      }
 
-  sql.query(`DELETE FROM ${table} WHERE id = '${id}'`, (err, res) => {
+      if (res.affectedRows === 0) {
+        logger.info('no records found')
+        result({ kind: 'not_found' }, null)
+        return
+      }
+
+      logger.info(`deleted request with id ${body.id}`)
+      result(null, res)
+    }
+  )
+}
+
+Request.archive = (id, result) => {
+  const moveQuery = `INSERT INTO archive_requests SELECT * FROM new_requests WHERE id=${id}`
+  const cleanQuery = `DELETE FROM new_requests WHERE id=${id}`
+
+  sql.query(moveQuery, (err, res) => {
     if (err) {
       logger.error('error: ', err)
       result(null, err)
@@ -67,10 +98,21 @@ Request.remove = (id, result) => {
       result({ kind: 'not_found' }, null)
       return
     }
-
-    logger.info(`deleted request with id ${id}`)
-    result(null, res)
+    logger.info(`moved request with id ${id}`)
+    sql.query(cleanQuery, (error, response) => {
+      if (error) {
+        logger.error('error: ', error)
+        result(null, error)
+        return
+      }
+      if (response.affectedRows === 0) {
+        logger.info('no records found')
+        result({ kind: 'not_found' }, null)
+        return
+      }
+      logger.info(`Deleted active request with id ${id}`)
+      result(null, response)
+    })
   })
 }
-
 module.exports = Request

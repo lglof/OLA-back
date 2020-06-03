@@ -16,7 +16,7 @@ exports.create = (req, res) => {
     course: req.body.course,
   })
 
-  Request.create(request, (err, data) => {
+  Request.create(request, req.body.archive, (err, data) => {
     if (err) {
       res.status(500).send({
         message: err.message || 'An error occured while creating the request.',
@@ -26,7 +26,7 @@ exports.create = (req, res) => {
 }
 
 exports.query = (req, res) => {
-  Request.query(req.query, (err, data) => {
+  Request.query(req, req.body.archive, (err, data) => {
     if (err) {
       if (err.kind === 'not_found') {
         res.status(204).send({
@@ -47,7 +47,7 @@ exports.remove = (req, res) => {
       message: 'No id provided',
     })
   }
-  Request.remove(req.body.id, (err) => {
+  Request.remove(req.body, req.body.archive, (err) => {
     if (err) {
       if (err.kind === 'not_found') {
         res.status(404).send({
@@ -59,5 +59,26 @@ exports.remove = (req, res) => {
         })
       }
     } else res.send({ message: 'Request successfully deleted' })
+  })
+}
+
+exports.archive = (req, res) => {
+  if (!req.body.id) {
+    res.status(400).send({
+      message: 'No id provided',
+    })
+  }
+  Request.archive(req.body.id, (err) => {
+    if (err) {
+      if (err.kind === 'not_found') {
+        res.status(404).send({
+          message: `No active requests with id ${req.body.id}`,
+        })
+      } else {
+        res.status(500).send({
+          message: `Could not archive request number ${req.body.id}`,
+        })
+      }
+    } else res.send({ message: 'Request successfully archived' })
   })
 }

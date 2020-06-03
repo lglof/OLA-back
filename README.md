@@ -8,11 +8,13 @@ It's your everyday semi-basic CRUD api.
 
 ### Requests
 
-| Route         | Method   | Request                                                                                                                                                                                                      | Response                                                   | Notes                                                                                                 |
-| ------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| /insert_entry | `POST`   | JSON payload: `{headers: { 'Content-Type': 'application/json'}, body: {name: 'unspecified', contact: 'unspecified', title: 'unspecified', due: '2020-05-05', description: 'string', course: 'course code'}}` | 200                                                        | Each parameter is optional, adds a row entry with this info. Default values are listed in the payload |
-| /query        | `GET`    | URL parameters: `query/?name='string'&due='date'&id='number'&contact='contact'`                                                                                                                              | A JSON string containing all entries satisfying your query | Each of the parameters is optional. No parameters returns all of the table's rows                     |
-| /delete_entry | `DELETE` | JSON payload: `{headers: {'Content-Type': 'application/json'}, body: {id: 'integer'}}`                                                                                                                       | 200                                                        | Deletes the row corresponding to the provided Id (the primary key of an entry)                        |
+`/insert_entry`, `/query`, and `/delete_entry` all accept `archive: true` in the body of the request in order to interact with the archive database.
+
+| Route         | Method   | Request                                                                                                                                                                                                      | Response                                                   | Notes                                                                                                                                                                                            |
+| ------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| /insert_entry | `POST`   | JSON payload: `{headers: { 'Content-Type': 'application/json'}, body: {name: 'unspecified', contact: 'unspecified', title: 'unspecified', due: '2020-05-05', description: 'string', course: 'course code'}}` | 200                                                        | Each parameter is optional, adds a row entry with this info. Default values are listed in the payload. DO NOT INSERT AN ENTRY DIRECTLY INTO THE ARCHIVE (I'm working on fixing that but for now) |
+| /query        | `GET`    | URL parameters: `query/?name='string'&due='date'&id='number'&contact='contact'`                                                                                                                              | A JSON string containing all entries satisfying your query | Each of the parameters is optional. No parameters returns all of the table's rows                                                                                                                |
+| /delete_entry | `DELETE` | JSON payload: `{headers: {'Content-Type': 'application/json'}, body: {id: 'integer'}}`                                                                                                                       | 200                                                        | Deletes the row corresponding to the provided Id (the primary key of an entry)                                                                                                                   |
 
 ### Errors
 
@@ -108,3 +110,9 @@ Stretch goal: send these logs to mysql instead of dumping into a textfile.
 ## Serving
 
 This should be running on the SYDE/BME server using [forever](https://www.npmjs.com/package/forever). They have a good documentation, worth checking out.
+
+## Concerns
+
+I'm not sure exactly how much use this app is going to get but we could run into issues with logging and archive table size. They could both end up too large.
+I suggest making a timestamped copy of the logs once a week and dumping them into a different file (and then clearing the log within the repo)
+The archive db could also end up being too large. I'm assuming it's possible to queue up the requests and pop out old ones so the queue stays a specific length.

@@ -9,10 +9,13 @@ const tableConfig =
   ' description TEXT NOT NULL,' +
   ' course VARCHAR(255) DEFAULT "unspecified"'
 
-const queryText = `CREATE TABLE IF NOT EXISTS new_requests(${tableConfig})`
+const newRequests = `CREATE TABLE IF NOT EXISTS new_requests(${tableConfig})`
+const archiveRequests = `CREATE TABLE IF NOT EXISTS archive_requests(${tableConfig})`
 
-mysql.query(queryText, (err) => {
+mysql.query(newRequests, (err) => {
   if (err) throw err
 })
 
-process.exit()
+mysql.query(archiveRequests, (err) => {
+  if (err) throw err
+})
