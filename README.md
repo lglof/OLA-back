@@ -6,11 +6,26 @@ This is for use with the SYDE/BME ola requests system. It's a basic wrapper for 
 
 It's your everyday semi-basic CRUD api.
 
+### Requests
+
 | Route         | Method   | Request                                                                                                                                                                                                      | Response                                                   | Notes                                                                                                 |
 | ------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
 | /insert_entry | `POST`   | JSON payload: `{headers: { 'Content-Type': 'application/json'}, body: {name: 'unspecified', contact: 'unspecified', title: 'unspecified', due: '2020-05-05', description: 'string', course: 'course code'}}` | 200                                                        | Each parameter is optional, adds a row entry with this info. Default values are listed in the payload |
 | /query        | `GET`    | URL parameters: `query/?name='string'&due='date'&id='number'&contact='contact'`                                                                                                                              | A JSON string containing all entries satisfying your query | Each of the parameters is optional. No parameters returns all of the table's rows                     |
 | /delete_entry | `DELETE` | JSON payload: `{headers: {'Content-Type': 'application/json'}, body: {id: 'integer'}}`                                                                                                                       | 200                                                        | Deletes the row corresponding to the provided Id (the primary key of an entry)                        |
+
+### Errors
+
+| Route           | Code | Message                                                                                                   | Notes                                                                      |
+| --------------- | ---- | --------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| `/insert_entry` | 400  | Missing required fields                                                                                   | The request body is empty, or is missing the contact or description fields |
+| `/insert_entry` | 201  | returns the inserted values                                                                               | it worked!                                                                 |
+| `/query`        | 204  | no requests found                                                                                         | there's no requests matching the query                                     |
+| `/query`        | 200  | returns the requests matching the query                                                                   | it worked!                                                                 |
+| `/delete_entry` | 400  | no id provided                                                                                            | an id must be provided for the request to delete                           |
+| `/delete_entry` | 404  | request with id # not found                                                                               | there's no request with the provided id in the db                          |
+| `delete_entry`  | 200  | request successfully deleted                                                                              | it worked!                                                                 |
+| any             | 500  | could not delete request number #, error retrieving requests, an error occured while creating the request | there was an internal server error                                         |
 
 ## Set up
 

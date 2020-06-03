@@ -1,9 +1,9 @@
 const Request = require('../models/request.model')
 
 exports.create = (req, res) => {
-  if (!req.body) {
+  if (!req.body || !req.body.contact || !req.body.description) {
     res.status(400).send({
-      message: 'Content can not be empty',
+      message: 'Missing Required Fields',
     })
   }
 
@@ -21,7 +21,7 @@ exports.create = (req, res) => {
       res.status(500).send({
         message: err.message || 'An error occured while creating the request.',
       })
-    } else res.send(data)
+    } else res.status(201).send(data)
   })
 }
 
@@ -29,7 +29,7 @@ exports.query = (req, res) => {
   Request.query(req.query, (err, data) => {
     if (err) {
       if (err.kind === 'not_found') {
-        res.status(404).send({
+        res.status(204).send({
           message: 'No requests found',
         })
       } else {
@@ -42,15 +42,20 @@ exports.query = (req, res) => {
 }
 
 exports.remove = (req, res) => {
+  if (!req.body.id) {
+    res.status(400).send({
+      message: 'No id provided',
+    })
+  }
   Request.remove(req.body.id, (err) => {
     if (err) {
       if (err.kind === 'not_found') {
         res.status(404).send({
-          message: `Request with id ${req.query.id} not found`,
+          message: `Request with id ${req.body.id} not found`,
         })
       } else {
         res.status(500).send({
-          message: `Could not delete request number ${req.query.id}`,
+          message: `Could not delete request number ${req.body.id}`,
         })
       }
     } else res.send({ message: 'Request successfully deleted' })
