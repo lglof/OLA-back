@@ -37,13 +37,12 @@ Request.create = (newRequest, archive, result) => {
 
 Request.query = (req, archive, result) => {
   let sqlQ = `SELECT * FROM ${whichTable(archive)}`
-  const keys = Object.keys(req.params)
+  const keys = Object.keys(req)
   for (let i = 0; i < keys.length; i += 1) {
     sqlQ += i > 0 ? ' AND' : ' WHERE'
-    sqlQ += req.params[keys[i]].length
-      ? ` ${keys[i]}='${req.params[keys[i]]}'`
-      : ''
+    sqlQ += req[keys[i]].length ? ` ${keys[i]}='${req[keys[i]]}'` : ''
   }
+
   sql.query(sqlQ, (err, res) => {
     if (err) {
       logger.error('error: ', err)

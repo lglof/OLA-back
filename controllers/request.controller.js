@@ -26,7 +26,7 @@ exports.create = (req, res) => {
 }
 
 exports.query = (req, res) => {
-  Request.query(req, req.body.archive, (err, data) => {
+  Request.query(req.query, req.body.archive, (err, data) => {
     if (err) {
       if (err.kind === 'not_found') {
         res.status(204).send({
